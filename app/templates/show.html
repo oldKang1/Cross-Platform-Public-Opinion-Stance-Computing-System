@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>小红书舆情分析 - 数据展示</title>
+  <title>XHS Opinion · 舆情分析看板</title>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,7 +50,7 @@
     .delay-100 { transition-delay: 100ms; }
     .delay-200 { transition-delay: 200ms; }
     .delay-300 { transition-delay: 300ms; }
-    
+
     /* Data visualization styles */
     .chart-container {
       background: rgba(255, 255, 255, 0.05);
@@ -60,7 +60,7 @@
       padding: 24px;
       margin-bottom: 24px;
     }
-    
+
     .data-card {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -69,23 +69,23 @@
       padding: 20px;
       margin-bottom: 16px;
     }
-    
+
     .progress-bar {
       height: 8px;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 4px;
       overflow: hidden;
     }
-    
+
     .progress-fill {
       height: 100%;
       border-radius: 4px;
     }
-    
+
     .sentiment-positive { background: linear-gradient(90deg, #10b981, #34d399); }
     .sentiment-neutral { background: linear-gradient(90deg, #94a3b8, #cbd5e1); }
     .sentiment-negative { background: linear-gradient(90deg, #ef4444, #f87171); }
-    
+
     .opinion-support { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
     .opinion-oppose { background: linear-gradient(90deg, #f97316, #fb923c); }
     .opinion-neutral { background: linear-gradient(90deg, #94a3b8, #cbd5e1); }
@@ -99,28 +99,27 @@
   <!-- Navigation (Fixed) -->
   <header class="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/5 backdrop-blur-md transition-all duration-300">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+      <a href="#top" class="flex items-center gap-2 hover:opacity-90 transition-opacity">
         <div class="w-4 h-4 rounded-full bg-gradient-to-tr from-amber-200 to-amber-500"></div>
         <div class="text-sm font-medium tracking-tight uppercase opacity-90">XHS Opinion</div>
-      </div>
+      </a>
 
       <nav class="hidden md:flex items-center gap-8 text-xs font-medium text-white/70">
-        <a href="/" class="hover:text-white transition-colors duration-200">首页</a>
         <a href="#overview" class="hover:text-white transition-colors duration-200">概览</a>
-        <a href="#analysis" class="hover:text-white transition-colors duration-200">分析详情</a>
+        <a href="#analysis" class="hover:text-white transition-colors duration-200">分析</a>
+        <a href="#insights" class="hover:text-white transition-colors duration-200">洞察</a>
       </nav>
 
       <div class="flex items-center gap-4">
-        <a href="#" class="hidden md:block text-xs font-medium text-white/70 hover:text-white transition-colors">控制台</a>
         <button class="px-3 py-1.5 rounded-full bg-white text-black text-xs font-medium hover:bg-gray-200 transition-colors duration-200 shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-          导出数据
+          导出报告
         </button>
       </div>
     </div>
   </header>
 
   <!-- Scrollable Content -->
-  <div class="relative z-10 w-full">
+  <div id="top" class="relative z-10 w-full">
     <!-- Hero Section -->
     <section class="min-h-screen flex flex-col justify-center items-start px-6 md:px-12 max-w-7xl mx-auto pt-20">
       <div class="reveal inline-flex items-center gap-2 px-3 py-1 mb-8 text-xs font-medium text-amber-200/90 bg-amber-500/10 border border-amber-500/20 rounded-full backdrop-blur-sm">
@@ -128,32 +127,31 @@
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
         </span>
-        <span class="tracking-wide">舆情分析结果 · 实时更新</span>
+        <span class="tracking-wide">数据已更新 · 可用于汇报与展示</span>
       </div>
 
       <h1 class="reveal delay-100 text-5xl md:text-7xl font-medium tracking-tighter mb-8 leading-[0.95] text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50">
-        数据<br>洞察
+        舆情分析<br>数据看板
       </h1>
 
-      <p class="reveal delay-200 text-lg md:text-xl text-white/60 font-normal leading-relaxed max-w-lg mb-12 tracking-wide">
-        小红书评论舆情分析结果展示：立场识别、情绪量化、时间演化与地域分布的综合可视化分析。
+      <p class="reveal delay-200 text-lg md:text-xl text-white/60 font-normal leading-relaxed max-w-2xl mb-12 tracking-wide">
+        统一呈现评论情绪分布、地域差异与立场结构，帮助你快速定位热点、评估倾向，并为研究/复盘提供数据依据。
       </p>
 
       <div class="reveal delay-300 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-        <button class="group flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-black bg-white rounded-full hover:bg-gray-100 transition-all duration-200">
-          刷新数据
-          <iconify-icon icon="lucide:refresh-cw" class="transition-transform group-hover:translate-x-1" width="16" stroke-width="1.5"></iconify-icon>
-        </button>
-        <button class="flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-white bg-white/5 border border-white/10 rounded-full backdrop-blur-md hover:bg-white/10 transition-all duration-200">
-          <iconify-icon icon="lucide:bar-chart-3" width="16" stroke-width="1.5"></iconify-icon>
-          <span class="font-mono opacity-80">查看完整报告</span>
-        </button>
+        <a href="#analysis" class="group flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-black bg-white rounded-full hover:bg-gray-100 transition-all duration-200">
+          进入分析
+          <iconify-icon icon="lucide:arrow-down" class="transition-transform group-hover:translate-y-0.5" width="16" stroke-width="1.5"></iconify-icon>
+        </a>
+        <a href="#overview" class="flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-white bg-white/5 border border-white/10 rounded-full backdrop-blur-md hover:bg-white/10 transition-all duration-200">
+          查看概览指标
+        </a>
       </div>
 
       <!-- Scroll Indicator -->
       <div class="absolute bottom-12 left-6 md:left-12 flex items-center gap-3 text-xs text-white/40 font-medium animate-pulse">
         <iconify-icon icon="lucide:mouse-pointer-2" width="14" stroke-width="1.5"></iconify-icon>
-        向下滚动查看详细分析
+        向下滚动查看更多
       </div>
     </section>
 
@@ -162,64 +160,68 @@
       <div class="max-w-7xl mx-auto">
         <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
           <div class="reveal">
-            <h2 class="text-3xl font-medium tracking-tight mb-4">舆情概览</h2>
+            <div class="flex items-center gap-4 mb-4">
+              <h2 class="text-3xl font-medium tracking-tight">概览</h2>
+              <div class="px-3 py-1.5 rounded-lg bg-white/10 text-white text-xs font-medium border border-white/20">
+                实时统计
+              </div>
+            </div>
             <p class="text-white/50 max-w-md text-sm leading-relaxed">
-              基于最新采集的评论数据，从立场、情绪、时间与地域等维度的综合分析结果。
+              核心指标用于快速把握整体舆情结构与情绪分布。
             </p>
           </div>
           <div class="text-right hidden md:block reveal delay-100">
-            <div class="text-xs text-white/30 font-mono mb-1">更新时间</div>
-            <div class="text-xl text-emerald-400 font-mono">实时</div>
+            <div class="text-xs text-white/30 font-mono mb-1">数据状态</div>
+            <div class="text-xl text-emerald-400 font-mono">在线</div>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <!-- Total Comments Card -->
           <div class="reveal delay-100 data-card">
             <div class="text-sm text-white/60 mb-2">总评论数</div>
-            <div class="text-3xl font-bold text-white">124,583</div>
-            <div class="text-xs text-emerald-400 mt-1">+12.3% ↑</div>
+            <div class="text-3xl font-bold text-white">141,167</div>
+            <div class="text-xs text-white/40 mt-1">清洗后有效样本</div>
           </div>
 
-          <!-- Opinion Distribution Card -->
           <div class="reveal delay-200 data-card">
-            <div class="text-sm text-white/60 mb-2">立场分布</div>
-            <div class="flex items-center gap-2 mb-1">
-              <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-              <span class="text-xs">支持: 42.1%</span>
-            </div>
-            <div class="flex items-center gap-2 mb-1">
-              <div class="w-2 h-2 rounded-full bg-orange-500"></div>
-              <span class="text-xs">反对: 31.7%</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <div class="w-2 h-2 rounded-full bg-gray-400"></div>
-              <span class="text-xs">中立: 26.2%</span>
+            <div class="text-sm text-white/60 mb-2">情绪结构</div>
+            <div class="text-xs text-white/40 leading-relaxed">
+              统计维度覆盖正面/负面/中性情绪，用于衡量整体舆论温度与风险区间。
             </div>
           </div>
 
-          <!-- Sentiment Distribution Card -->
           <div class="reveal delay-300 data-card">
             <div class="text-sm text-white/60 mb-2">情绪分布</div>
-            <div class="flex items-center gap-2 mb-1">
-              <div class="w-2 h-2 rounded-full bg-green-500"></div>
-              <span class="text-xs">正面: 38.5%</span>
+
+            <div class="flex items-center justify-between text-xs mb-1">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                <span>正面</span>
+              </div>
+              <span class="font-mono text-white/70">84,936 · 60.2%</span>
             </div>
-            <div class="flex items-center gap-2 mb-1">
-              <div class="w-2 h-2 rounded-full bg-gray-400"></div>
-              <span class="text-xs">中性: 45.2%</span>
+
+            <div class="flex items-center justify-between text-xs mb-1">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-red-400"></div>
+                <span>负面</span>
+              </div>
+              <span class="font-mono text-white/70">32,507 · 23.0%</span>
             </div>
-            <div class="flex items-center gap-2">
-              <div class="w-2 h-2 rounded-full bg-red-500"></div>
-              <span class="text-xs">负面: 16.3%</span>
+
+            <div class="flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-slate-300"></div>
+                <span>中性</span>
+              </div>
+              <span class="font-mono text-white/70">23,724 · 16.8%</span>
             </div>
           </div>
 
-          <!-- Confidence Score Card -->
           <div class="reveal delay-100 data-card">
-            <div class="text-sm text-white/60 mb-2">平均置信度</div>
+            <div class="text-sm text-white/60 mb-2">模型置信度</div>
             <div class="text-3xl font-bold text-white">87.4%</div>
-            <div class="text-xs text-amber-400 mt-1">高置信度分析</div>
+            <div class="text-xs text-white/40 mt-1">用于结果参考与筛选</div>
           </div>
         </div>
       </div>
@@ -229,120 +231,102 @@
     <section id="analysis" class="py-32 px-6 border-t border-white/5 bg-black/40 backdrop-blur-lg">
       <div class="max-w-7xl mx-auto">
         <div class="reveal mb-16">
-          <h2 class="text-3xl font-medium tracking-tight mb-4">详细分析</h2>
-          <p class="text-white/50 max-w-2xl text-sm leading-relaxed">
-            基于机器学习模型的多维度舆情分析结果，包含立场识别、情绪量化、时间演化趋势与地域分布特征。
-          </p>
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h2 class="text-3xl font-medium tracking-tight mb-4">分析</h2>
+              <p class="text-white/50 max-w-2xl text-sm leading-relaxed">
+                从地域差异、整体情绪分布以及立场结构三个维度呈现关键结论，便于复盘与决策支持。
+              </p>
+            </div>
+            <div class="flex gap-3">
+              <button class="px-4 py-2 rounded-lg bg-white/10 text-white text-sm font-medium hover:bg-white/20 transition-colors duration-200 border border-white/20">
+                导出图表
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <!-- Opinion Distribution Chart -->
+          <!-- 地区情绪分布 -->
           <div class="reveal delay-100 chart-container">
-            <h3 class="text-xl font-medium mb-6">立场分布</h3>
-            <div class="space-y-4">
+            <div class="flex items-start justify-between gap-6 mb-6">
               <div>
-                <div class="flex justify-between mb-1">
-                  <span class="text-sm">支持立场</span>
-                  <span class="text-sm">42.1%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill opinion-support" style="width: 42.1%"></div>
-                </div>
+                <h3 class="text-xl font-medium">地区情绪分布（Top15）</h3>
+                <p class="text-sm text-white/50 mt-1">展示各地区评论量与情绪构成的差异。</p>
               </div>
-              <div>
-                <div class="flex justify-between mb-1">
-                  <span class="text-sm">反对立场</span>
-                  <span class="text-sm">31.7%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill opinion-oppose" style="width: 31.7%"></div>
-                </div>
+
+              <div class="hidden md:flex items-center gap-3 text-xs text-white/60">
+                <span class="inline-flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>Positive
+                </span>
+                <span class="inline-flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-slate-300"></span>Neutral
+                </span>
+                <span class="inline-flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-red-400"></span>Negative
+                </span>
               </div>
-              <div>
-                <div class="flex justify-between mb-1">
-                  <span class="text-sm">中立立场</span>
-                  <span class="text-sm">26.2%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill opinion-neutral" style="width: 26.2%"></div>
-                </div>
-              </div>
+            </div>
+
+            <div class="rounded-2xl overflow-hidden border border-white/10 bg-white/5">
+              <img src="/static/region_sentiment_top15.png" alt="地区情绪分布 Top15" class="w-full h-auto block" loading="lazy" />
+            </div>
+
+            <div class="mt-4 text-xs text-white/40 leading-relaxed">
+              Top15 地区用于对比地域差异与情绪结构集中度。
             </div>
           </div>
 
-          <!-- Sentiment Distribution Chart -->
+          <!-- NLP 情绪分布 -->
           <div class="reveal delay-200 chart-container">
-            <h3 class="text-xl font-medium mb-6">情绪分布</h3>
-            <div class="space-y-4">
+            <div class="flex items-start justify-between gap-6 mb-6">
               <div>
-                <div class="flex justify-between mb-1">
-                  <span class="text-sm">正面情绪</span>
-                  <span class="text-sm">38.5%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill sentiment-positive" style="width: 38.5%"></div>
+                <h3 class="text-xl font-medium">情绪总体分布</h3>
+                <p class="text-sm text-white/50 mt-1">汇总全量样本的情绪占比与强度。</p>
+              </div>
+              <div class="text-right">
+                <div class="text-xs text-white/30 font-mono">Total</div>
+                <div class="text-lg text-emerald-400 font-mono">141,167</div>
+              </div>
+            </div>
+
+            <div class="rounded-2xl overflow-hidden border border-white/10 bg-white/5">
+              <img src="/static/nlp_sentiment_dist.png" alt="情绪总体分布" class="w-full h-auto block" loading="lazy" />
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="data-card !mb-0">
+                <div class="text-xs text-white/40 mb-2">Positive</div>
+                <div class="text-2xl font-semibold text-white">84,936</div>
+                <div class="text-xs text-emerald-400 mt-1 font-mono">60.2%</div>
+                <div class="progress-bar mt-3">
+                  <div class="progress-fill sentiment-positive" style="width: 60.2%"></div>
                 </div>
               </div>
-              <div>
-                <div class="flex justify-between mb-1">
-                  <span class="text-sm">中性情绪</span>
-                  <span class="text-sm">45.2%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill sentiment-neutral" style="width: 45.2%"></div>
+
+              <div class="data-card !mb-0">
+                <div class="text-xs text-white/40 mb-2">Negative</div>
+                <div class="text-2xl font-semibold text-white">32,507</div>
+                <div class="text-xs text-red-400 mt-1 font-mono">23.0%</div>
+                <div class="progress-bar mt-3">
+                  <div class="progress-fill sentiment-negative" style="width: 23%"></div>
                 </div>
               </div>
-              <div>
-                <div class="flex justify-between mb-1">
-                  <span class="text-sm">负面情绪</span>
-                  <span class="text-sm">16.3%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill sentiment-negative" style="width: 16.3%"></div>
+
+              <div class="data-card !mb-0">
+                <div class="text-xs text-white/40 mb-2">Neutral</div>
+                <div class="text-2xl font-semibold text-white">23,724</div>
+                <div class="text-xs text-slate-300 mt-1 font-mono">16.8%</div>
+                <div class="progress-bar mt-3">
+                  <div class="progress-fill sentiment-neutral" style="width: 16.8%"></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Time Evolution Chart -->
-          <div class="reveal delay-300 chart-container">
-            <h3 class="text-xl font-medium mb-6">时间演化趋势</h3>
-            <div class="h-64 flex items-end justify-between space-x-1 pt-4">
-              <div class="flex flex-col items-center flex-1">
-                <div class="text-xs text-white/60 mb-2">周一</div>
-                <div class="w-full bg-gradient-to-t from-blue-500 to-blue-700 rounded-t" style="height: 60%;"></div>
-              </div>
-              <div class="flex flex-col items-center flex-1">
-                <div class="text-xs text-white/60 mb-2">周二</div>
-                <div class="w-full bg-gradient-to-t from-blue-500 to-blue-700 rounded-t" style="height: 75%;"></div>
-              </div>
-              <div class="flex flex-col items-center flex-1">
-                <div class="text-xs text-white/60 mb-2">周三</div>
-                <div class="w-full bg-gradient-to-t from-blue-500 to-blue-700 rounded-t" style="height: 45%;"></div>
-              </div>
-              <div class="flex flex-col items-center flex-1">
-                <div class="text-xs text-white/60 mb-2">周四</div>
-                <div class="w-full bg-gradient-to-t from-blue-500 to-blue-700 rounded-t" style="height: 80%;"></div>
-              </div>
-              <div class="flex flex-col items-center flex-1">
-                <div class="text-xs text-white/60 mb-2">周五</div>
-                <div class="w-full bg-gradient-to-t from-blue-500 to-blue-700 rounded-t" style="height: 90%;"></div>
-              </div>
-              <div class="flex flex-col items-center flex-1">
-                <div class="text-xs text-white/60 mb-2">周六</div>
-                <div class="w-full bg-gradient-to-t from-orange-500 to-orange-700 rounded-t" style="height: 70%;"></div>
-              </div>
-              <div class="flex flex-col items-center flex-1">
-                <div class="text-xs text-white/60 mb-2">周日</div>
-                <div class="w-full bg-gradient-to-t from-green-500 to-green-700 rounded-t" style="height: 55%;"></div>
-              </div>
-            </div>
-            <div class="mt-4 text-sm text-white/60">注：蓝色表示支持立场，橙色表示反对立场，绿色表示正面情绪</div>
-          </div>
-
-          <!-- Regional Distribution Chart -->
+          <!-- 地域分布（列表） -->
           <div class="reveal delay-100 chart-container">
-            <h3 class="text-xl font-medium mb-6">地域分布</h3>
+            <h3 class="text-xl font-medium mb-6">地域贡献度（Top5）</h3>
             <div class="space-y-3">
               <div>
                 <div class="flex justify-between mb-1">
@@ -390,18 +374,136 @@
                 </div>
               </div>
             </div>
+            <div class="mt-4 text-xs text-white/40">
+              该模块用于快速识别主要地域来源与贡献度集中情况。
+            </div>
+          </div>
+
+          <!-- 情绪 × 立场 -->
+          <div class="reveal delay-200 chart-container">
+            <div class="flex items-start justify-between gap-6 mb-6">
+              <div>
+                <h3 class="text-xl font-medium">立场 × 情绪 结构</h3>
+                <p class="text-sm text-white/50 mt-1">
+                  用于评估不同立场下的情绪偏向，支持进一步的相关性分析。
+                </p>
+              </div>
+
+              <div class="text-right">
+                <div class="text-xs text-white/30 font-mono">Total</div>
+                <div class="text-lg text-emerald-400 font-mono">141,167</div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-4 text-xs text-white/60 mb-6">
+              <span class="inline-flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>Positive
+              </span>
+              <span class="inline-flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-slate-300"></span>Neutral
+              </span>
+              <span class="inline-flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-red-400"></span>Negative
+              </span>
+            </div>
+
+            <div class="rounded-2xl overflow-hidden border border-white/10 bg-white/5">
+              <div class="grid grid-cols-4 text-sm">
+                <!-- Header row -->
+                <div class="p-4 bg-white/5 border-b border-white/10 text-white/40 font-mono">立场 \ 情绪</div>
+                <div class="p-4 bg-white/5 border-b border-white/10 text-white/70 font-medium">Positive</div>
+                <div class="p-4 bg-white/5 border-b border-white/10 text-white/70 font-medium">Neutral</div>
+                <div class="p-4 bg-white/5 border-b border-white/10 text-white/70 font-medium">Negative</div>
+
+                <!-- Row: 支持 -->
+                <div class="p-4 border-b border-white/10 text-white/70 font-medium">支持</div>
+                <div class="p-4 border-b border-white/10">
+                  <div class="text-lg font-semibold">26.4%</div>
+                  <div class="progress-bar mt-2">
+                    <div class="progress-fill sentiment-positive" style="width: 26.4%"></div>
+                  </div>
+                  <div class="text-xs text-white/40 mt-2 font-mono">≈ 37,260</div>
+                </div>
+                <div class="p-4 border-b border-white/10">
+                  <div class="text-lg font-semibold">11.5%</div>
+                  <div class="progress-bar mt-2">
+                    <div class="progress-fill sentiment-neutral" style="width: 11.5%"></div>
+                  </div>
+                  <div class="text-xs text-white/40 mt-2 font-mono">≈ 16,240</div>
+                </div>
+                <div class="p-4 border-b border-white/10">
+                  <div class="text-lg font-semibold">4.2%</div>
+                  <div class="progress-bar mt-2">
+                    <div class="progress-fill sentiment-negative" style="width: 4.2%"></div>
+                  </div>
+                  <div class="text-xs text-white/40 mt-2 font-mono">≈ 5,930</div>
+                </div>
+
+                <!-- Row: 反对 -->
+                <div class="p-4 border-b border-white/10 text-white/70 font-medium">反对</div>
+                <div class="p-4 border-b border-white/10">
+                  <div class="text-lg font-semibold">14.9%</div>
+                  <div class="progress-bar mt-2">
+                    <div class="progress-fill sentiment-positive" style="width: 14.9%"></div>
+                  </div>
+                  <div class="text-xs text-white/40 mt-2 font-mono">≈ 21,040</div>
+                </div>
+                <div class="p-4 border-b border-white/10">
+                  <div class="text-lg font-semibold">8.1%</div>
+                  <div class="progress-bar mt-2">
+                    <div class="progress-fill sentiment-neutral" style="width: 8.1%"></div>
+                  </div>
+                  <div class="text-xs text-white/40 mt-2 font-mono">≈ 11,440</div>
+                </div>
+                <div class="p-4 border-b border-white/10">
+                  <div class="text-lg font-semibold">8.7%</div>
+                  <div class="progress-bar mt-2">
+                    <div class="progress-fill sentiment-negative" style="width: 8.7%"></div>
+                  </div>
+                  <div class="text-xs text-white/40 mt-2 font-mono">≈ 12,280</div>
+                </div>
+
+                <!-- Row: 中立 -->
+                <div class="p-4 text-white/70 font-medium">中立</div>
+                <div class="p-4">
+                  <div class="text-lg font-semibold">18.9%</div>
+                  <div class="progress-bar mt-2">
+                    <div class="progress-fill sentiment-positive" style="width: 18.9%"></div>
+                  </div>
+                  <div class="text-xs text-white/40 mt-2 font-mono">≈ 26,636</div>
+                </div>
+                <div class="p-4">
+                  <div class="text-lg font-semibold">—</div>
+                  <div class="progress-bar mt-2">
+                    <div class="progress-fill sentiment-neutral" style="width: 0%"></div>
+                  </div>
+                  <div class="text-xs text-white/40 mt-2 font-mono">—</div>
+                </div>
+                <div class="p-4">
+                  <div class="text-lg font-semibold">—</div>
+                  <div class="progress-bar mt-2">
+                    <div class="progress-fill sentiment-negative" style="width: 0%"></div>
+                  </div>
+                  <div class="text-xs text-white/40 mt-2 font-mono">—</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 text-xs text-white/40 leading-relaxed">
+              该模块可用于复盘“立场与情绪偏向”的关系，并支持后续统计检验与对比分析。
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Key Insights Section -->
-    <section class="py-32 px-6 border-t border-white/5 bg-black/60">
+    <section id="insights" class="py-32 px-6 border-t border-white/5 bg-black/60">
       <div class="max-w-7xl mx-auto">
         <div class="reveal mb-16">
-          <h2 class="text-3xl font-medium tracking-tight mb-4">关键洞察</h2>
+          <h2 class="text-3xl font-medium tracking-tight mb-4">洞察</h2>
           <p class="text-white/50 max-w-2xl text-sm leading-relaxed">
-            基于舆情分析模型输出的关键发现和趋势预测
+            从数据结果抽取可复用的结论模板，适用于汇报、复盘与论文讨论部分。
           </p>
         </div>
 
@@ -410,9 +512,9 @@
             <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mb-6 text-white">
               <iconify-icon icon="lucide:trending-up" width="20" stroke-width="1.5"></iconify-icon>
             </div>
-            <h3 class="text-lg font-medium mb-2 tracking-tight">趋势洞察</h3>
+            <h3 class="text-lg font-medium mb-2 tracking-tight">趋势判断</h3>
             <p class="text-sm text-white/50 leading-relaxed">
-              支持立场在工作日较为集中，周末情绪波动较大，建议关注特定时间段的舆论变化。
+              结合时间窗口对情绪波动进行对比，可快速识别“事件触发点”与讨论热度变化。
             </p>
           </div>
 
@@ -420,9 +522,9 @@
             <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mb-6 text-white">
               <iconify-icon icon="lucide:map-pin" width="20" stroke-width="1.5"></iconify-icon>
             </div>
-            <h3 class="text-lg font-medium mb-2 tracking-tight">地域特征</h3>
+            <h3 class="text-lg font-medium mb-2 tracking-tight">地域差异</h3>
             <p class="text-sm text-white/50 leading-relaxed">
-              一线城市评论情绪较为理性，二三线城市情绪表达更直接，地域文化差异显著。
+              重点地区可进一步细分到城市层级与话题标签，用于定位内容传播与用户画像特征。
             </p>
           </div>
 
@@ -430,9 +532,9 @@
             <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mb-6 text-white">
               <iconify-icon icon="lucide:activity" width="20" stroke-width="1.5"></iconify-icon>
             </div>
-            <h3 class="text-lg font-medium mb-2 tracking-tight">情绪特征</h3>
+            <h3 class="text-lg font-medium mb-2 tracking-tight">风险识别</h3>
             <p class="text-sm text-white/50 leading-relaxed">
-              正面情绪主要集中在产品功能讨论，负面情绪多出现在价格相关话题。
+              当负面占比与特定立场同时升高时，建议结合关键词与高频主题进行进一步排查与归因。
             </p>
           </div>
         </div>
@@ -440,80 +542,20 @@
     </section>
 
     <!-- Footer -->
-    <footer class="py-20 px-6 border-t border-white/5 bg-black relative overflow-hidden">
+    <footer class="py-16 px-6 border-t border-white/5 bg-black relative overflow-hidden">
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-amber-500/10 blur-[100px] rounded-full pointer-events-none opacity-50"></div>
 
       <div class="max-w-7xl mx-auto relative z-10">
-        <div class="grid grid-cols-1 md:grid-cols-6 gap-12 mb-20 reveal">
-          <div class="col-span-1 md:col-span-2 flex flex-col gap-4">
-            <div class="flex items-center gap-2">
-              <div class="w-4 h-4 rounded-full bg-gradient-to-tr from-amber-200 to-amber-500"></div>
-              <span class="text-lg font-medium tracking-tight">XHS Opinion</span>
-            </div>
-            <p class="text-sm text-white/40 max-w-xs leading-relaxed">
-              面向小红书评论的立场识别与舆情演化分析。用于科研与教学展示，可扩展为可视化监测平台。
-            </p>
-            <div class="flex gap-4 mt-4">
-              <a href="#" class="text-white/40 hover:text-white transition-colors"><iconify-icon icon="lucide:twitter" width="18"></iconify-icon></a>
-              <a href="#" class="text-white/40 hover:text-white transition-colors"><iconify-icon icon="lucide:github" width="18"></iconify-icon></a>
-              <a href="#" class="text-white/40 hover:text-white transition-colors"><iconify-icon icon="lucide:disc" width="18"></iconify-icon></a>
-            </div>
-          </div>
-
-          <div>
-            <h4 class="text-sm font-medium text-white mb-4">功能</h4>
-            <ul class="space-y-3 text-sm text-white/40">
-              <li><a href="#overview" class="hover:text-white transition-colors">数据概览</a></li>
-              <li><a href="#analysis" class="hover:text-white transition-colors">详细分析</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">时间演化</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">地域分布</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 class="text-sm font-medium text-white mb-4">数据</h4>
-            <ul class="space-y-3 text-sm text-white/40">
-              <li><a href="#" class="hover:text-white transition-colors">原始数据</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">分析模型</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">置信度报告</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">导出选项</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 class="text-sm font-medium text-white mb-4">合规</h4>
-            <ul class="space-y-3 text-sm text-white/40">
-              <li><a href="#" class="hover:text-white transition-colors">隐私保护</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">仅限研究</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">数据脱敏</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">使用条款</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 class="text-sm font-medium text-white mb-4">运行状态</h4>
-            <div class="flex items-center gap-2 text-sm text-emerald-400">
-              <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
-              </span>
-              模型与服务运行正常
-            </div>
-          </div>
-        </div>
-
-        <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-white/20 reveal delay-100">
-          <p>© 2026 XHS Opinion. 仅用于学习与科研展示。</p>
-          <p>Built with <iconify-icon icon="lucide:heart" class="inline align-middle mx-1" width="10"></iconify-icon> and a suspicious amount of coffee.</p>
+        <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-white/30 reveal delay-100">
+          <p>© 2026 XHS Opinion · 舆情分析看板</p>
+          <p>用于科研与课程项目展示 · 支持结果导出</p>
         </div>
       </div>
     </footer>
   </div>
 
-  <!-- Hidden slider input for JS logic compatibility -->
   <input type="range" id="timeSlider" min="0" max="100" value="15" class="hidden">
 
-  <!-- Logic -->
   <script>
     // --- Intersection Observer for Animations ---
     const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
@@ -675,6 +717,5 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
   </script>
-
 </body>
 </html>
