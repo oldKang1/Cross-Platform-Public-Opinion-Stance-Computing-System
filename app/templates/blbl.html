@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bili Sentiment · B站视频评论态度分析</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script>
+
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: #0f172a;
+      overflow-x: hidden;
+    }
+    #canvas-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    html { scroll-behavior: smooth; }
+    ::-webkit-scrollbar { width: 6px; background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+      filter: blur(5px);
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    .delay-100 { transition-delay: 100ms; }
+    .delay-200 { transition-delay: 200ms; }
+    .delay-300 { transition-delay: 300ms; }
+
+    /* Terminal/Console Styles */
+    .terminal-scroll::-webkit-scrollbar { width: 4px; }
+    .terminal-scroll::-webkit-scrollbar-thumb { background: #fb7299; border-radius: 2px; }
+
+    .typing-cursor::after {
+      content: '▋';
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Ensure input box is visible */
+    #search-box { display: block; }
+    #videoUrl { display: block; width: 100%; }
+
+    /* Animation effects */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes fadeInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    @keyframes fadeInRight {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    .animate-fade-in-up {
+      animation: fadeInUp 0.8s ease-out;
+    }
+    .animate-fade-in-left {
+      animation: fadeInLeft 0.8s ease-out;
+    }
+    .animate-fade-in-right {
+      animation: fadeInRight 0.8s ease-out;
+    }
+  </style>
+</head>
+
+<body class="text-white antialiased selection:bg-pink-500/30">
+
+  <!-- 3D Scene Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Navigation -->
+  <header class="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/5 backdrop-blur-md transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 hover:opacity-90 transition-opacity">
+        <div class="w-4 h-4 rounded-md bg-gradient-to-tr from-pink-400 to-blue-400"></div>
+        <div class="text-sm font-medium tracking-tight uppercase opacity-90">Bili Sentiment</div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-8 text-xs font-medium text-white/70">
+        <a href="#input-section" class="hover:text-pink-300 transition-colors">数据采集</a>
+        <a href="#analysis-section" class="hover:text-blue-300 transition-colors">NLP 分析</a>
+        <a href="#visual-section" class="hover:text-pink-300 transition-colors">可视化看板</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <span class="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-white/60">
+          <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+          NLP 实验组
+        </span>
+        <div class="px-3 py-1.5 rounded-full bg-pink-500/10 text-pink-300 border border-pink-500/20 text-xs font-medium">
+          v2.0 Stable
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div id="top" class="relative z-10 w-full">
+
+    <!-- Hero / Input Section -->
+    <section id="input-section" class="min-h-screen flex flex-col justify-center items-start px-6 md:px-12 max-w-7xl mx-auto pt-20">
+
+      <!-- Status Badge -->
+      <div class="reveal inline-flex items-center gap-2 px-3 py-1 mb-8 text-xs font-medium text-pink-200/90 bg-pink-500/10 border border-pink-500/20 rounded-full backdrop-blur-sm">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-pink-400"></span>
+        </span>
+        <span class="tracking-wide">支持 BV 号 / 视频链接自动解析</span>
+      </div>
+
+      <h1 class="reveal delay-100 text-5xl md:text-7xl font-medium tracking-tighter mb-8 leading-[1.1] text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-pink-200">
+        弹幕之海，<br>心声之镜。
+      </h1>
+      
+      <p class="reveal delay-200 text-lg md:text-xl text-white/60 font-normal leading-relaxed max-w-2xl mb-12 tracking-wide">
+        输入B站视频链接，让NLP为你解读弹幕背后的情感密码，洞察群体情绪的潮汐与涟漪。
+      </p>
+
+      <!-- Input & Action Area -->
+      <div class="reveal delay-300 w-full max-w-3xl flex flex-col gap-6">
+
+        <!-- Input Form -->
+        <div class="relative group" id="search-box">
+          <div class="absolute -inset-1 bg-gradient-to-r from-pink-500 to-blue-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+          <div class="relative flex flex-col sm:flex-row gap-2 p-2 bg-black/80 ring-1 ring-white/10 rounded-2xl backdrop-blur-xl">
+            <input type="text" id="videoUrl"
+              placeholder="粘贴视频链接 (例如: https://www.bilibili.com/video/BV1...)"
+              class="w-full bg-transparent text-white px-4 py-3 outline-none placeholder:text-white/30 font-mono text-sm"
+            >
+            <button id="btnStartCrawl" onclick="startScraping()"
+              class="px-8 py-3 rounded-xl bg-white text-black font-semibold text-sm hover:bg-pink-50 transition-colors shadow-lg shadow-pink-500/20 whitespace-nowrap flex items-center justify-center gap-2">
+              <iconify-icon icon="lucide:search"></iconify-icon>
+              探索弹幕之海
+            </button>
+          </div>
+        </div>
+
+        <!-- Headless Mode Selection -->
+        <div class="flex items-center gap-2 p-2 bg-black/50 rounded-xl border border-white/10">
+          <span class="text-sm text-white/80 font-medium">浏览器模式：</span>
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="radio" name="browserMode" id="headlessMode" value="headless" class="sr-only peer" checked>
+            <span class="px-3 py-1.5 rounded-lg bg-white/5 text-white/60 border border-white/10 text-xs peer-checked:bg-blue-500/20 peer-checked:text-blue-300 peer-checked:border-blue-500/30 transition-colors">
+              有头模式
+            </span>
+          </label>
+          
+
+        <!-- CRAWLING TERMINAL (Hidden initially) -->
+        <div id="crawler-terminal" class="hidden w-full rounded-2xl bg-black/90 border border-white/10 backdrop-blur-md p-6 font-mono text-xs md:text-sm shadow-2xl relative overflow-hidden transition-all duration-500 ease-out">
+          <!-- Terminal Header -->
+          <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
+             <div class="flex gap-2">
+               <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
+               <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+               <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
+             </div>
+             <div class="text-white/30 text-[10px]">CRAWLER_NODE_V1.2</div>
+          </div>
+          <!-- Logs Container -->
+          <div id="terminal-content" class="h-48 overflow-y-auto terminal-scroll flex flex-col gap-1 text-white/70">
+            <!-- Logs will be injected here via JS -->
+          </div>
+        </div>
+
+        <!-- NLP Trigger (Hidden initially) -->
+        <div id="nlp-trigger" class="hidden opacity-0 transition-opacity duration-1000 flex flex-col items-center gap-4 py-6">
+          <div class="flex items-center gap-3 text-emerald-400 text-sm font-medium">
+             <iconify-icon icon="lucide:check-circle" width="18"></iconify-icon>
+             弹幕之海已探索完毕 (<span id="comment-count">0</span> 条心声已收录)
+          </div>
+          <button id="btnStartNLP" onclick="startNLP()" class="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full font-medium text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all overflow-hidden">
+             <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+             <span class="relative flex items-center gap-2">
+               <iconify-icon icon="lucide:brain-circuit" width="20"></iconify-icon>
+               解码群体情绪
+             </span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Placeholder Analysis Section (Optional Anchor) -->
+    <section id="analysis-section" class="py-24 px-6 border-t border-white/5 bg-black/30">
+      <div class="max-w-7xl mx-auto">
+        <div class="inline-flex items-center gap-2 px-3 py-1 mb-4 text-[10px] font-mono uppercase text-pink-300 bg-pink-500/10 border border-pink-500/20 rounded">
+          Pipeline
+        </div>
+        <h2 class="text-3xl font-medium tracking-tight mb-2">采集 → 清洗 → NLP → 可视化</h2>
+        <p class="text-white/50 text-sm max-w-3xl">
+          采集阶段抓取评论与楼中楼；NLP 阶段进行情感分类/主题聚类；最终输出看板。
+        </p>
+      </div>
+    </section>
+
+    <!-- Visualization Dashboard (Revealed after NLP) -->
+    <section id="visual-section" class="py-32 px-6 border-t border-white/5 bg-gradient-to-b from-black/60 to-black/90 backdrop-blur-lg hidden opacity-0 transition-all duration-1000">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 mb-4 text-[10px] font-mono uppercase text-blue-300 bg-blue-500/10 border border-blue-500/20 rounded">
+              Analysis Report
+            </div>
+            <h2 class="text-3xl font-medium tracking-tight mb-2">情绪洞察看板</h2>
+            <p class="text-white/50 text-sm">基于 RoBERTa 模型的情绪分析与热点发现</p>
+          </div>
+          <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="text-xs text-white/40 hover:text-white transition-colors flex items-center gap-1">
+            <iconify-icon icon="lucide:rotate-ccw"></iconify-icon> 重置分析
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-auto animate-fade-in-up">
+
+          <!-- Chart 1 -->
+          <div class="p-6 rounded-3xl bg-white/5 border border-white/10 flex flex-col animate-fade-in-left">
+            <h3 class="text-sm font-medium text-white/80 mb-6 flex items-center gap-2">
+              <iconify-icon icon="lucide:pie-chart" class="text-pink-400"></iconify-icon> 情感极性分布
+            </h3>
+            <div class="flex-1 flex items-center justify-center relative">
+              <div id="sentiment-ring"
+                   class="w-48 h-48 rounded-full border-[16px] border-transparent"
+                   style="
+                     background: conic-gradient(#fb7299 0% 40%, #3b82f6 40% 85%, #ef4444 85% 100%);
+                     mask: radial-gradient(transparent 55%, black 56%);
+                     -webkit-mask: radial-gradient(transparent 55%, black 56%);
+                     box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+                   ">
+              </div>
+              <div class="absolute text-center">
+                <div id="sentiment-center" class="text-2xl font-bold text-white">--%</div>
+                <div id="sentiment-center-desc" class="text-xs text-white/40">积极情绪</div>
+              </div>
+            </div>
+            <div class="mt-6 flex justify-center gap-4 text-xs text-white/50">
+              <span id="legend-pos" class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-pink-400"></span>积极 (--%)</span>
+              <span id="legend-neu" class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-blue-500"></span>中立 (--%)</span>
+              <span id="legend-neg" class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-red-500"></span>消极 (--%)</span>
+            </div>
+          </div>
+
+          <!-- Chart 2 -->
+          <div class="p-6 rounded-3xl bg-white/5 border border-white/10 flex flex-col animate-fade-in-right">
+            <h3 class="text-sm font-medium text-white/80 mb-6 flex items-center gap-2">
+              <iconify-icon icon="lucide:bar-chart-3" class="text-blue-400"></iconify-icon> 情感排序
+            </h3>
+            <div class="flex-1 flex items-end justify-between gap-2 px-4 pb-2 border-b border-white/5 min-h-[200px]">
+              <div id="pos-bar" class="w-full bg-pink-500/30 hover:bg-pink-500/50 transition-all rounded-t-sm h-[30%] shadow-lg"></div>
+              <div id="neu-bar" class="w-full bg-blue-500/30 hover:bg-blue-500/50 transition-all rounded-t-sm h-[50%] shadow-lg"></div>
+              <div id="neg-bar" class="w-full bg-red-500/30 hover:bg-red-500/50 transition-all rounded-t-sm h-[80%] shadow-lg"></div>
+            </div>
+            <div class="flex justify-between mt-2 text-xs text-white/30 font-mono">
+              <span>积极</span>
+              <span>中立</span>
+              <span>消极</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-16 px-6 border-t border-white/5 bg-black relative overflow-hidden">
+       <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-pink-600/10 blur-[120px] rounded-full pointer-events-none"></div>
+       <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-white/30">
+          <p>Powered by Bilibili API & NLP Transformers</p>
+          <p>计科2307 NLP 课程作业展示</p>
+       </div>
+    </footer>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    // ========= 0) Helpers =========
+    const terminal = document.getElementById('crawler-terminal');
+    const terminalContent = document.getElementById('terminal-content');
+    const nlpTrigger = document.getElementById('nlp-trigger');
+    const visualSection = document.getElementById('visual-section');
+    const videoInput = document.getElementById('videoUrl');
+    const commentCount = document.getElementById('comment-count');
+    const btnStartCrawl = document.getElementById('btnStartCrawl');
+    const btnStartNLP = document.getElementById('btnStartNLP');
+
+    let crawlPollingTimer = null;
+    let nlpPollingTimer = null;
+
+    // 获取浏览器模式选择
+    function getBrowserMode() {
+      const headlessMode = document.getElementById('headlessMode');
+      const headedMode = document.getElementById('headedMode');
+      if (headlessMode.checked) {
+        return 'headless';
+      } else if (headedMode.checked) {
+        return 'headed';
+      } else {
+        return 'headless';
+      }
+    }
+
+    function nowTime() {
+      return new Date().toLocaleTimeString();
+    }
+
+    function addLog(text, colorClass = "text-white/70") {
+      const div = document.createElement('div');
+      div.className = `${colorClass} text-xs font-mono border-l-2 border-transparent pl-2 hover:border-white/20 transition-colors`;
+      div.innerHTML = `<span class="opacity-50 mr-2">[${nowTime()}]</span>${text}`;
+      terminalContent.appendChild(div);
+      terminalContent.scrollTop = terminalContent.scrollHeight;
+    }
+
+    function showTerminal() {
+      terminal.classList.remove('hidden');
+      terminalContent.innerHTML = '';
+    }
+
+    function showNLPTrigger(total) {
+      commentCount.textContent = (total ?? 0);
+      nlpTrigger.classList.remove('hidden');
+      void nlpTrigger.offsetWidth; // reflow for transition
+      nlpTrigger.classList.remove('opacity-0');
+    }
+
+    function showVisualBoard() {
+      visualSection.classList.remove('hidden');
+      void visualSection.offsetWidth; // reflow for transition
+      visualSection.classList.remove('opacity-0');
+      visualSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function stopCrawlPolling() {
+      if (crawlPollingTimer) clearTimeout(crawlPollingTimer);
+      crawlPollingTimer = null;
+    }
+
+    function stopNLPPolling() {
+      if (nlpPollingTimer) clearTimeout(nlpPollingTimer);
+      nlpPollingTimer = null;
+    }
+
+    // ========= 1) Start Scraping =========
+    async function startScraping() {
+      const videoUrl = (videoInput.value || "").trim();
+      if (!videoUrl) {
+        videoInput.classList.add('ring-red-500', 'ring-2');
+        setTimeout(() => videoInput.classList.remove('ring-red-500', 'ring-2'), 1000);
+        return;
+      }
+
+      // Reset UI state
+      stopCrawlPolling();
+      stopNLPPolling();
+      nlpTrigger.classList.add('hidden');
+      nlpTrigger.classList.add('opacity-0');
+      visualSection.classList.add('hidden');
+      visualSection.classList.add('opacity-0');
+
+      showTerminal();
+      addLog("正在连接到后端服务...", "text-blue-300");
+
+      // disable button to avoid duplicate jobs
+      btnStartCrawl.disabled = true;
+      btnStartCrawl.classList.add('opacity-70', 'cursor-not-allowed');
+
+      try {
+        const browserMode = getBrowserMode();
+        const resp = await fetch('/api/start-crawl', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ video_url: videoUrl, browser_mode: browserMode }),
+        });
+
+        if (!resp.ok) {
+          throw new Error(`HTTP ${resp.status}`);
+        }
+
+        const result = await resp.json();
+        addLog(`爬取已启动: ${result.video_url || videoUrl}`, "text-green-400");
+        addLog("任务已提交，开始轮询状态...", "text-white/60");
+
+        // start polling
+        checkCrawlStatus();
+      } catch (e) {
+        addLog(`启动失败: ${e.message}`, "text-red-400");
+        btnStartCrawl.disabled = false;
+        btnStartCrawl.classList.remove('opacity-70', 'cursor-not-allowed');
+      }
+    }
+
+    // ========= 2) Poll Crawl Status =========
+    let lastMessage = null;
+    let lastProgress = null;
+    let lastHeartbeatTs = 0;
+
+    async function checkCrawlStatus() {
+      try {
+        const response = await fetch('/api/crawl-status');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const status = await response.json();
+
+        // 后端报错直接停
+        if (status.error) {
+          addLog(`错误: ${status.error}`, "text-red-400");
+          return;
+        }
+
+        // 1) message 变化才打印
+        if (status.message && status.message !== lastMessage) {
+          addLog(status.message, "text-yellow-300");
+          lastMessage = status.message;
+        }
+
+        // 2) progress 变化才打印（避免 0% 刷屏）
+        if (typeof status.progress === "number" && status.progress !== lastProgress) {
+          addLog(`进度更新: ${status.progress}%`, "text-blue-300");
+          lastProgress = status.progress;
+        }
+
+        // 3) 运行中但没有新信息 → 打“心跳”提示（每 8 秒一次）
+        if (status.is_running) {
+          const now = Date.now();
+          if (now - lastHeartbeatTs > 8000) {
+            addLog("仍在爬取中...（后端处理中）", "text-white/50");
+            lastHeartbeatTs = now;
+          }
+          crawlPollingTimer = setTimeout(checkCrawlStatus, 2000);
+          return;
+        }
+
+        // 4) 完成
+        const total = status.total_comments ?? 0;
+        addLog(`爬取完成！共获取 ${total} 条评论`, "text-emerald-400");
+
+        // 展示 NLP 按钮
+        commentCount.textContent = total;
+        nlpTrigger.classList.remove('hidden');
+        void nlpTrigger.offsetWidth;
+        nlpTrigger.classList.remove('opacity-0');
+
+        // 释放按钮
+        btnStartCrawl.disabled = false;
+        btnStartCrawl.classList.remove('opacity-70', 'cursor-not-allowed');
+
+      } catch (error) {
+        addLog(`状态检查错误: ${error.message}`, "text-red-400");
+        crawlPollingTimer = setTimeout(checkCrawlStatus, 3000);
+      }
+    }
+
+    // ========= 3) Start NLP =========
+    async function startNLP() {
+      // button UX
+      const original = btnStartNLP.innerHTML;
+      btnStartNLP.disabled = true;
+      btnStartNLP.classList.add('cursor-not-allowed', 'opacity-80');
+      btnStartNLP.innerHTML = `<span class="relative flex items-center gap-2">
+        <iconify-icon icon="lucide:loader-2" class="animate-spin" width="20"></iconify-icon>
+        分析中...
+      </span>`;
+
+      addLog("收到 NLP 指令，启动分析...", "text-blue-300");
+
+      // 1) 先尝试调用真实 NLP 启动接口（如果你后端没做这个接口，会自动 fallback）
+      try {
+        const resp = await fetch('/api/start-nlp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        });
+
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const result = await resp.json();
+        addLog(result.message || "NLP 任务已启动，开始轮询 NLP 状态...", "text-green-400");
+
+        checkNLPStatus(original);
+      } catch (e) {
+        // fallback: 如果你后端暂时没做 NLP 这两个接口，仍然可以直接展示看板
+        addLog(`提示: /api/start-nlp 不可用（${e.message}），将直接展示看板（你后端补完 NLP 接口后就会自动变成真实流程）`, "text-yellow-300");
+        btnStartNLP.disabled = false;
+        btnStartNLP.classList.remove('cursor-not-allowed', 'opacity-80');
+        btnStartNLP.innerHTML = original;
+
+        // 直接展示看板
+        showVisualBoard();
+        
+        // 尝试从本地数据加载并渲染
+        try {
+          const status = await fetch('/api/nlp-status', { method: 'GET' });
+          if (status.ok) {
+            const data = await status.json();
+            // 确保数据存在再渲染
+            if (data.sentiment) {
+              renderSentiment(data.sentiment);
+            } else {
+              // 如果没有数据，尝试重新加载
+              setTimeout(async () => {
+                try {
+                  const retryStatus = await fetch('/api/nlp-status', { method: 'GET' });
+                  if (retryStatus.ok) {
+                    const retryData = await retryStatus.json();
+                    renderSentiment(retryData.sentiment);
+                  }
+                } catch (retryError) {
+                  console.log('重试加载数据失败:', retryError);
+                }
+              }, 1000);
+            }
+          }
+        } catch (loadError) {
+          console.log('无法加载本地数据:', loadError);
+        }
+      }
+    }
+
+    // ========= 4) Poll NLP Status =========
+    async function checkNLPStatus(originalBtnHtml) {
+      try {
+        const resp = await fetch('/api/nlp-status', { method: 'GET' });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const status = await resp.json();
+
+        if (status.error) {
+          addLog(`NLP 错误: ${status.error}`, "text-red-400");
+          btnStartNLP.disabled = false;
+          btnStartNLP.classList.remove('cursor-not-allowed', 'opacity-80');
+          btnStartNLP.innerHTML = originalBtnHtml;
+          return;
+        }
+
+        if (status.is_running) {
+          if (typeof status.progress === 'number') {
+            addLog(`NLP 分析中... 进度: ${status.progress}%`, "text-yellow-300");
+          } else if (status.message) {
+            addLog(status.message, "text-yellow-300");
+          } else {
+            addLog("NLP 分析中...", "text-yellow-300");
+          }
+          nlpPollingTimer = setTimeout(() => checkNLPStatus(originalBtnHtml), 2000);
+          return;
+        }
+                
+        // NLP done
+        addLog("NLP 分析完成！生成可视化看板。", "text-emerald-400");
+        btnStartNLP.disabled = false;
+        btnStartNLP.classList.remove('cursor-not-allowed', 'opacity-80');
+        btnStartNLP.innerHTML = originalBtnHtml;
+                
+        // 确保数据存在再渲染
+        if (status.sentiment) {
+          // 调用渲染函数显示数据驱动的看板
+          renderSentiment(status.sentiment);
+        } else {
+          // 如果没有数据，尝试从本地加载
+          try {
+            const localStatus = await fetch('/api/nlp-status', { method: 'GET' });
+            if (localStatus.ok) {
+              const data = await localStatus.json();
+              // 确保数据存在再渲染
+              if (data.sentiment) {
+                renderSentiment(data.sentiment);
+              }
+            }
+          } catch (loadError) {
+            console.log('无法加载本地数据:', loadError);
+          }
+        }
+                
+        showVisualBoard();
+
+      } catch (e) {
+        addLog(`NLP 状态检查错误: ${e.message}`, "text-red-400");
+        nlpPollingTimer = setTimeout(() => checkNLPStatus(originalBtnHtml), 3000);
+      }
+    }
+
+    // ========= 5) Three.js Background (Bilibili Theme) =========
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    const fogColor = new THREE.Color(0x1a1c2e);
+    scene.fog = new THREE.FogExp2(fogColor, 0.005);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 5, 20);
+    camera.lookAt(0, 2, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    const waterGeometry = new THREE.PlaneGeometry(300, 300, 128, 128);
+    const waterMaterial = new THREE.MeshStandardMaterial({
+      color: 0x223355,
+      roughness: 0.1,
+      metalness: 0.8,
+      transparent: true,
+      opacity: 0.8,
+      side: THREE.DoubleSide
+    });
+    const water = new THREE.Mesh(waterGeometry, waterMaterial);
+    water.rotation.x = -Math.PI / 2;
+    scene.add(water);
+
+    const sunGeometry = new THREE.SphereGeometry(20, 32, 32);
+    const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xfb7299 });
+    const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+    sun.position.set(0, 10, -100);
+    scene.add(sun);
+
+    const ambientLight = new THREE.AmbientLight(0x404040, 1);
+    scene.add(ambientLight);
+
+    const sunLight = new THREE.DirectionalLight(0xfb7299, 1);
+    sunLight.position.set(0, 10, -80);
+    scene.add(sunLight);
+
+    const blueLight = new THREE.PointLight(0x00aeec, 0.8, 100);
+    blueLight.position.set(20, 10, 10);
+    scene.add(blueLight);
+
+    let time = 0;
+    const waterVertices = waterGeometry.attributes.position;
+    const initialWaterZ = [];
+    for (let i = 0; i < waterVertices.count; i++) initialWaterZ.push(waterVertices.getZ(i));
+
+    function animate() {
+      requestAnimationFrame(animate);
+      time += 0.008;
+
+      for (let i = 0; i < waterVertices.count; i++) {
+        const x = waterVertices.getX(i);
+        const y = waterVertices.getY(i);
+        const wave1 = Math.sin(x * 0.1 + time) * 1.0;
+        const wave2 = Math.cos(y * 0.1 + time * 0.8) * 1.0;
+        waterVertices.setZ(i, initialWaterZ[i] + wave1 + wave2);
+      }
+      waterVertices.needsUpdate = true;
+      waterGeometry.computeVertexNormals();
+
+      camera.position.x = Math.sin(time * 0.05) * 2;
+      camera.lookAt(0, 2, 0);
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      const fraction = Math.min(1, scrollY / maxScroll);
+
+      sun.position.y = 10 - (fraction * 30);
+
+      const r = 251 - (fraction * 200);
+      const g = 114 - (fraction * 100);
+      const b = 153 - (fraction * 100);
+      sunMaterial.color.setRGB(r/255, g/255, b/255);
+    });
+  </script>
+
+  <!-- ✅ 方案B：Reveal 滚动进入视口才显示（你缺的就是这段） -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const reveals = document.querySelectorAll(".reveal");
+
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          (entries, obs) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("active");
+                obs.unobserve(entry.target); // 只触发一次
+              }
+            });
+          },
+          {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+          }
+        );
+
+        reveals.forEach(el => observer.observe(el));
+      } else {
+        // 兜底：老浏览器直接显示
+        reveals.forEach(el => el.classList.add("active"));
+      }
+    });
+
+    // 关键词点击处理函数
+    function showKeywordDetails(keyword) {
+      alert(`正在分析关键词: ${keyword}`);
+      // 这里可以添加更复杂的逻辑，比如高亮相关评论、显示该关键词的详细分析等
+    }
+    
+    // 渲染情感分布图
+    function clamp01(x) {
+      x = Number(x);
+      if (!Number.isFinite(x)) return 0;
+      return Math.max(0, Math.min(1, x));
+    }
+    
+    function renderSentiment(sentiment) {
+      if (!sentiment) return;
+          
+      let pos = clamp01(sentiment.pos);
+      let neu = clamp01(sentiment.neu);
+      let neg = clamp01(sentiment.neg);
+          
+      // 归一化：防止后端给的不是严格相加=1（很常见）
+      const sum = pos + neu + neg;
+      if (sum > 0) {
+        pos /= sum; neu /= sum; neg /= sum;
+      }
+          
+      const posP = Math.round(pos * 100);
+      const neuP = Math.round(neu * 100);
+      const negP = 100 - posP - neuP; // 保证加起来=100，避免四舍五入误差
+          
+      const ring = document.getElementById('sentiment-ring');
+      const center = document.getElementById('sentiment-center');
+      const centerDesc = document.getElementById('sentiment-center-desc');
+          
+      const lpos = document.getElementById('legend-pos');
+      const lneu = document.getElementById('legend-neu');
+      const lneg = document.getElementById('legend-neg');
+          
+      // 获取柱状图元素
+      const posBar = document.getElementById('pos-bar');
+      const neuBar = document.getElementById('neu-bar');
+      const negBar = document.getElementById('neg-bar');
+          
+      if (!ring) return;
+          
+      const a = posP;
+      const b = posP + neuP;
+          
+      // 颜色语义：积极=粉，中立=蓝，消极=红
+      ring.style.background = `conic-gradient(
+        #fb7299 0% ${a}% ,
+        #3b82f6 ${a}% ${b}% ,
+        #ef4444 ${b}% 100%
+      )`;
+          
+      if (center) center.textContent = `${posP}%`;
+          
+      // 中心描述：显示占比最大的类别，更"像真实分析"
+      const maxLabel =
+        pos >= neu && pos >= neg ? '积极情绪' :
+        neu >= pos && neu >= neg ? '中立为主' :
+        '积极兴趣';
+          
+      if (centerDesc) centerDesc.textContent = maxLabel;
+          
+      if (lpos) lpos.innerHTML = `<span class="w-2 h-2 rounded bg-pink-400"></span>积极 (${posP}%)`;
+      if (lneu) lneu.innerHTML = `<span class="w-2 h-2 rounded bg-blue-500"></span>中立 (${neuP}%)`;
+      if (lneg) lneg.innerHTML = `<span class="w-2 h-2 rounded bg-red-500"></span>消极 (${negP}%)`;
+          
+      // 更新柱状图高度
+      if (posBar) {
+        posBar.style.height = `${posP}%`;
+        posBar.style.display = 'block';
+      }
+      if (neuBar) {
+        neuBar.style.height = `${neuP}%`;
+        neuBar.style.display = 'block';
+      }
+      if (negBar) {
+        negBar.style.height = `${negP}%`;
+        negBar.style.display = 'block';
+      }
+    }
+    
+    // 渲染讨论热度图
+    // 已移除，只保留情感极性分布图
+    
+    // 渲染关键词
+    // 已移除，只保留情感极性分布图
+  </script>
+
+</body>
+</html>

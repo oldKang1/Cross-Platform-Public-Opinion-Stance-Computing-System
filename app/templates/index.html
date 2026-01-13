@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpinionFlow · 跨平台舆情与立场计算</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script>
+
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: #0f172a;
+      overflow-x: hidden;
+    }
+    #canvas-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    html { scroll-behavior: smooth; }
+    ::-webkit-scrollbar { width: 0px; background: transparent; }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+      filter: blur(5px);
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    .delay-100 { transition-delay: 100ms; }
+    .delay-200 { transition-delay: 200ms; }
+    .delay-300 { transition-delay: 300ms; }
+  </style>
+</head>
+
+<body class="text-white antialiased selection:bg-amber-500/30">
+  <!-- 3D Scene Container (Fixed Background) -->
+  <div id="canvas-container"></div>
+
+  <!-- Navigation (Fixed) -->
+  <header class="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/5 backdrop-blur-md transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 hover:opacity-90 transition-opacity">
+        <div class="w-4 h-4 rounded-full bg-gradient-to-tr from-amber-200 to-amber-500"></div>
+        <div class="text-sm font-medium tracking-tight uppercase opacity-90">OpinionFlow</div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-8 text-xs font-medium text-white/70">
+        <a href="#overview" class="hover:text-white transition-colors duration-200">概览</a>
+        <a href="#branches" class="hover:text-white transition-colors duration-200">入口</a>
+        <a href="#features" class="hover:text-white transition-colors duration-200">核心能力</a>
+        <a href="#manifesto" class="hover:text-white transition-colors duration-200">方案说明</a>
+      </nav>
+
+      <!-- ✅ 右侧：班级标签（保留） -->
+      <div class="flex items-center gap-3">
+        <span class="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-white/60">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          计科2307
+        </span>
+
+        <!-- ✅ GitHub：顶栏轻入口 -->
+        <a href="https://github.com/oldKang1/Cross-Platform-Public-Opinion-Stance-Computing-System"
+           target="_blank" rel="noopener noreferrer"
+           class="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-white/60 hover:text-white hover:border-white/20 hover:bg-white/10 transition-colors">
+          <iconify-icon icon="lucide:github" width="14" stroke-width="1.5"></iconify-icon>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Scrollable Content -->
+  <div id="top" class="relative z-10 w-full">
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex flex-col justify-center items-start px-6 md:px-12 max-w-7xl mx-auto pt-20">
+      <div class="reveal inline-flex items-center gap-2 px-3 py-1 mb-8 text-xs font-medium text-amber-200/90 bg-amber-500/10 border border-amber-500/20 rounded-full backdrop-blur-sm">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
+        </span>
+        <span class="tracking-wide">跨平台舆情引擎 · 离线可复现 · 在线可追踪</span>
+      </div>
+
+      <h1 class="reveal delay-100 text-5xl md:text-8xl font-medium tracking-tighter mb-8 leading-[0.95] text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50">
+        立场成谱，<br>情绪成流。
+      </h1>
+
+      <p class="reveal delay-200 text-lg md:text-xl text-white/60 font-normal leading-relaxed max-w-2xl mb-12 tracking-wide">
+        把海量评论从“喧哗”提炼成“结构”：识别立场（支持/反对/中立），量化情绪起伏，并以时间与地区为坐标，呈现可对比、可复盘、可追踪的舆情图景。
+      </p>
+
+      <!-- ✅ 两条平级支路入口（同权重、同风格、不同强调色） -->
+      <div id="branches" class="reveal delay-300 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+        <!-- XHS Branch -->
+        <a href="/show"
+           class="group p-6 rounded-3xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors duration-300 backdrop-blur-md">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-amber-500/15 border border-amber-500/20 flex items-center justify-center text-amber-200">
+                <iconify-icon icon="lucide:database" width="18" stroke-width="1.5"></iconify-icon>
+              </div>
+              <div>
+                <div class="text-sm font-medium tracking-tight">小红书数据集评论分析</div>
+                <div class="text-xs text-white/45 mt-1">离线归档 · 可复现推演</div>
+              </div>
+            </div>
+
+            <div class="text-white/60 group-hover:text-white transition-colors">
+              <iconify-icon icon="lucide:arrow-right" width="18" stroke-width="1.5"
+                class="transition-transform group-hover:translate-x-1"></iconify-icon>
+            </div>
+          </div>
+
+          <div class="mt-4 text-sm text-white/50 leading-relaxed">
+            适用于课程汇报与论文实验：让既有数据集“说人话”——清洗、聚合、统计，将立场与情绪落到地区与时间轴上，形成可验证的证据链。
+          </div>
+
+          <div class="mt-3 text-xs text-white/40 flex items-center gap-2">
+            <div class="flex items-center gap-1">
+              <iconify-icon icon="lucide:database" width="12" class="text-amber-400"></iconify-icon>
+              <span>数据集：12,450条评论</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <iconify-icon icon="lucide:clock" width="12" class="text-emerald-400"></iconify-icon>
+              <span class="xhs-date">最后更新：2026-01-13</span>
+            </div>
+          </div>
+
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-200/80">CSV 归档输入</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/55">统计图表</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/55">导出结果</span>
+          </div>
+        </a>
+
+        <!-- Bili Branch -->
+        <a href="/blbl"
+           class="group p-6 rounded-3xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors duration-300 backdrop-blur-md">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-pink-500/15 border border-pink-500/25 flex items-center justify-center text-pink-200">
+                <iconify-icon icon="lucide:radar" width="18" stroke-width="1.5"></iconify-icon>
+              </div>
+              <div>
+                <div class="text-sm font-medium tracking-tight">B站评论分析</div>
+                <div class="text-xs text-white/45 mt-1">在线采集 · 近实时洞察</div>
+              </div>
+            </div>
+
+            <div class="text-white/60 group-hover:text-white transition-colors">
+              <iconify-icon icon="lucide:arrow-right" width="18" stroke-width="1.5"
+                class="transition-transform group-hover:translate-x-1"></iconify-icon>
+            </div>
+          </div>
+
+          <div class="mt-4 text-sm text-white/50 leading-relaxed">
+            适用于热点与争议话题：从评论流里捕捉“风向”——识别立场与情绪，快速生成观点结构，帮助判断讨论正在走向哪里。
+          </div>
+
+          <div class="mt-3 text-xs text-white/40 flex items-center gap-2">
+            <div class="flex items-center gap-1">
+              <iconify-icon icon="lucide:radar" width="12" class="text-pink-400"></iconify-icon>
+              <span>实时抓取</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <iconify-icon icon="lucide:clock" width="12" class="text-emerald-400"></iconify-icon>
+              <span class="bili-time">最近一次抓取：14:25</span>
+            </div>
+          </div>
+
+          <div class="mt-5 flex flex-wrap gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-full bg-pink-500/10 border border-pink-500/25 text-pink-200/80">实时分析</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/55">话题聚合</span>
+            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/55">结构输出</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- ✅ 成员信息：保留你原来的“产品化展示” -->
+      <div class="reveal delay-300 mt-6 flex flex-wrap gap-4 items-center">
+        <div class="flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-white bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
+          <iconify-icon icon="lucide:users" width="16" stroke-width="1.5"></iconify-icon>
+          <span class="text-white/70">小组</span>
+          <span class="text-white/35">·</span>
+          <span class="font-mono text-white/70">刘奕康</span>
+        </div>
+      </div>
+
+      <!-- Scroll Indicator -->
+      <div class="absolute bottom-12 left-6 md:left-12 flex items-center gap-3 text-xs text-white/40 font-medium animate-pulse">
+        <iconify-icon icon="lucide:mouse-pointer-2" width="14" stroke-width="1.5"></iconify-icon>
+        向下滚动了解能力与指标
+      </div>
+    </section>
+
+    <!-- Overview -->
+    <section id="overview" class="py-24 px-6 border-t border-white/5 bg-gradient-to-b from-transparent to-black/20 backdrop-blur-[2px]">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+          <div class="reveal">
+            <h2 class="text-3xl font-medium tracking-tight mb-4">概览</h2>
+            <p class="text-white/50 max-w-xl text-sm leading-relaxed">
+              系统覆盖两种场景：离线——让数据集可复现；在线——让评论流可追踪。统一输出立场结构与情绪分布，并以多维统计把"感觉"变成"证据"，便于汇报与答辩展示。
+            </p>
+          </div>
+          <div class="text-right hidden md:block reveal delay-100">
+            <div class="text-xs text-white/30 font-mono mb-1">状态</div>
+            <div class="text-xl text-emerald-400 font-mono">Online</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div class="flex flex-col gap-2 reveal delay-100">
+            <span class="text-4xl font-medium tracking-tight">多维</span>
+            <span class="text-xs font-medium uppercase text-white/40 tracking-wider">立场 / 情绪 / 地区 / 时间</span>
+          </div>
+          <div class="flex flex-col gap-2 reveal delay-200">
+            <span class="text-4xl font-medium tracking-tight">两模式</span>
+            <span class="text-xs font-medium uppercase text-white/40 tracking-wider">离线 / 在线</span>
+          </div>
+          <div class="flex flex-col gap-2 reveal delay-300">
+            <span class="text-4xl font-medium tracking-tight">可解释</span>
+            <span class="text-xs font-medium uppercase text-white/40 tracking-wider">置信度 / 分布统计</span>
+          </div>
+          <div class="flex flex-col gap-2 reveal delay-100">
+            <span class="text-4xl font-medium tracking-tight">可扩展</span>
+            <span class="text-xs font-medium uppercase text-white/40 tracking-wider">模型替换 / 数据源扩展</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section id="features" class="py-32 px-6 border-t border-white/5 bg-black/40 backdrop-blur-lg">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+          <div class="reveal">
+            <h2 class="text-3xl font-medium tracking-tight mb-4">核心能力</h2>
+            <p class="text-white/50 max-w-2xl text-sm leading-relaxed">
+              把评论从"碎片"聚成"地图"：可量化、可对比、可追踪，让研判更快，让复盘更准。
+            </p>
+          </div>
+          <div class="text-right hidden md:block reveal delay-100">
+            <div class="text-xs text-white/30 font-mono mb-1">输入</div>
+            <div class="text-xl text-emerald-400 font-mono">评论文本</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="reveal delay-100 p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors duration-300 group">
+            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mb-6 text-white group-hover:bg-white group-hover:text-black transition-all duration-300">
+              <iconify-icon icon="lucide:scale" width="20" stroke-width="1.5"></iconify-icon>
+            </div>
+            <h3 class="text-lg font-medium mb-2 tracking-tight">立场识别</h3>
+            <p class="text-sm text-white/50 leading-relaxed">
+              为每条评论标注支持 / 反对 / 中立，并输出置信度，让观点不再"凭感觉"，而是可拆解、可对照、可解释。
+            </p>
+          </div>
+
+          <div class="reveal delay-200 p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors duration-300 group">
+            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mb-6 text-white group-hover:bg-white group-hover:text-black transition-all duration-300">
+              <iconify-icon icon="lucide:activity" width="20" stroke-width="1.5"></iconify-icon>
+            </div>
+            <h3 class="text-lg font-medium mb-2 tracking-tight">情绪量化</h3>
+            <p class="text-sm text-white/50 leading-relaxed">
+              量化情绪极性与占比结构，识别情绪聚集与波动拐点，把"情绪的温度"呈现在图上。
+            </p>
+          </div>
+
+          <div class="reveal delay-300 p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors duration-300 group">
+            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mb-6 text-white group-hover:bg-white group-hover:text-black transition-all duration-300">
+              <iconify-icon icon="lucide:map" width="20" stroke-width="1.5"></iconify-icon>
+            </div>
+            <h3 class="text-lg font-medium mb-2 tracking-tight">地区与演化</h3>
+            <p class="text-sm text-white/50 leading-relaxed">
+              以地区为经纬、以时间为刻度，追踪热度与差异，让讨论的变化轨迹一目了然，并支持导出复盘。
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-10 reveal delay-200 flex flex-wrap gap-4">
+          <a href="/show" class="inline-flex items-center gap-2 text-sm text-amber-200/90 hover:text-amber-200 transition-colors">
+            进入小红书数据集分析
+            <iconify-icon icon="lucide:arrow-right" width="16" stroke-width="1.5"></iconify-icon>
+          </a>
+          <a href="/blbl" class="inline-flex items-center gap-2 text-sm text-pink-200/90 hover:text-pink-200 transition-colors">
+            进入B站评论分析
+            <iconify-icon icon="lucide:arrow-right" width="16" stroke-width="1.5"></iconify-icon>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Manifesto -->
+    <section id="manifesto" class="py-40 px-6 border-t border-white/5 bg-black/60">
+      <div class="max-w-4xl mx-auto text-center reveal">
+        <iconify-icon icon="lucide:quote" class="text-white/20 mb-8" width="32" stroke-width="1.5"></iconify-icon>
+        <h2 class="text-3xl md:text-5xl font-medium tracking-tight leading-tight text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40">
+          “我们不追逐热词，只追逐证据：把讨论拆成情绪、立场与分布，让结论可复盘、可对比、可解释。”
+        </h2>
+        <p class="mt-10 text-sm text-white/45 leading-relaxed max-w-2xl mx-auto reveal delay-200">
+          系统将评论沉淀为统计图表与交叉结构（如"立场 × 情绪"），用于衡量争议强度与群体差异；同时保留扩展接口，便于接入新模型与新数据源。
+        </p>
+
+        <div class="mt-10 flex items-center justify-center gap-3 text-xs text-white/40 reveal delay-300">
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>统一指标输出
+          </span>
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span>离线数据集分析
+          </span>
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+            <span class="w-2 h-2 rounded-full bg-pink-400"></span>在线评论分析
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-16 px-6 border-t border-white/5 bg-black relative overflow-hidden">
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-amber-500/10 blur-[100px] rounded-full pointer-events-none opacity-50"></div>
+
+      <div class="max-w-7xl mx-auto relative z-10">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-10 mb-10 reveal">
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-2">
+              <div class="w-4 h-4 rounded-full bg-gradient-to-tr from-amber-200 to-amber-500"></div>
+              <span class="text-lg font-medium tracking-tight">OpinionFlow</span>
+            </div>
+            <p class="text-sm text-white/40 max-w-xl leading-relaxed">
+              跨平台舆情与立场计算系统 · 离线可复现，在线可追踪。用于科研、课程与答辩展示。
+            </p>
+            <div class="text-xs text-white/35">
+              班级：XXXX刘奕康
+            </div>
+
+            <div class="text-xs text-white/35 mt-2">
+              开源地址：
+              <a href="https://github.com/oldKang1/Cross-Platform-Public-Opinion-Stance-Computing-System"
+                 target="_blank" rel="noopener noreferrer"
+                 class="text-white/45 hover:text-white transition-colors underline decoration-white/20 hover:decoration-white/40 break-all">
+                github.com/oldKang1/Cross-Platform-Public-Opinion-Stance-Computing-System
+              </a>
+            </div>
+          </div>
+
+          <div class="flex gap-3 flex-wrap">
+            <a href="/show" class="px-4 py-2 rounded-lg bg-white/10 text-white text-sm font-medium hover:bg-white/20 transition-colors border border-white/15">
+              小红书数据集分析
+            </a>
+            <a href="/blbl" class="px-4 py-2 rounded-lg bg-pink-500/20 text-white text-sm font-medium hover:bg-pink-500/30 transition-colors border border-pink-500/30">
+              B站评论分析
+            </a>
+            <a href="https://github.com/oldKang1/Cross-Platform-Public-Opinion-Stance-Computing-System"
+   target="_blank" rel="noopener noreferrer"
+   class="px-4 py-2 rounded-lg bg-white/5 text-white/60 text-sm font-medium hover:bg-white/10 transition-colors border border-white/10">
+  GitHub
+</a>
+          </div>
+        </div>
+
+        <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-white/25 reveal delay-100">
+          <p>© 2026 OpinionFlow · Author: <span class="font-mono text-white/40">oldKang1</span> · All rights reserved.</p>
+          <p>仅用于学习与科研展示 · 数据已做脱敏处理</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Hidden slider input for JS logic compatibility -->
+  <input type="range" id="timeSlider" min="0" max="100" value="15" class="hidden">
+
+  <!-- Logic -->
+  <script>
+    // --- Intersection Observer for Animations ---
+    const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('active');
+      });
+    }, observerOptions);
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // --- Update time for data status ---
+    function updateTime() {
+      const now = new Date();
+      const timeString = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+      const dateString = now.getFullYear() + '-' + (now.getMonth() + 1).toString().padStart(2, '0') + '-' + now.getDate().toString().padStart(2, '0');
+      
+      // Update Bili card time
+      const biliTimeElements = document.querySelectorAll('.bili-time');
+      biliTimeElements.forEach(el => {
+        el.textContent = '最近一次抓取：' + timeString;
+      });
+      
+      // Update XHS card date
+      const xhsDateElements = document.querySelectorAll('.xhs-date');
+      xhsDateElements.forEach(el => {
+        el.textContent = '最后更新：' + dateString;
+      });
+    }
+    
+    // Update time immediately and then every minute
+    updateTime();
+    setInterval(updateTime, 60000); // Update every minute
+
+    // --- Three.js Scene Setup ---
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    const fogColor = new THREE.Color(0x4a4e69);
+    scene.fog = new THREE.FogExp2(fogColor, 0.005);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 5, 20);
+    camera.lookAt(0, 2, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    container.appendChild(renderer.domElement);
+
+    // 1. Water
+    const waterGeometry = new THREE.PlaneGeometry(300, 300, 128, 128);
+    const waterMaterial = new THREE.MeshStandardMaterial({
+      color: 0x006994,
+      roughness: 0.1,
+      metalness: 0.6,
+      flatShading: false,
+      transparent: true,
+      opacity: 0.9,
+      side: THREE.DoubleSide
+    });
+    const water = new THREE.Mesh(waterGeometry, waterMaterial);
+    water.rotation.x = -Math.PI / 2;
+    water.receiveShadow = true;
+    scene.add(water);
+
+    // 2. Sand
+    const sandGeometry = new THREE.PlaneGeometry(300, 50, 64, 64);
+    const sandMaterial = new THREE.MeshStandardMaterial({
+      color: 0xE6C288,
+      roughness: 0.8,
+      metalness: 0.1
+    });
+    const sand = new THREE.Mesh(sandGeometry, sandMaterial);
+    sand.rotation.x = -Math.PI / 2;
+    sand.position.z = 80;
+    sand.position.y = -0.5;
+    sand.rotation.z = 0.05;
+    const sandPos = sand.geometry.attributes.position;
+    for (let i = 0; i < sandPos.count; i++) {
+      const z = sandPos.getZ(i);
+      sandPos.setZ(i, z + Math.random() * 0.5);
+    }
+    sand.geometry.computeVertexNormals();
+    scene.add(sand);
+
+    // 3. Sun
+    const sunGeometry = new THREE.SphereGeometry(15, 32, 32);
+    const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffaa33 });
+    const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+    scene.add(sun);
+
+    // --- Lights ---
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+    scene.add(ambientLight);
+
+    const sunLight = new THREE.DirectionalLight(0xffaa33, 1.5);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    scene.add(sunLight);
+
+    const fillLight = new THREE.PointLight(0x0044ff, 0.5, 100);
+    fillLight.position.set(0, 10, 10);
+    scene.add(fillLight);
+
+    // --- Animation State ---
+    let time = 0;
+    const waterVertices = waterGeometry.attributes.position;
+    const initialWaterZ = [];
+    for (let i = 0; i < waterVertices.count; i++) initialWaterZ.push(waterVertices.getZ(i));
+
+    // --- Logic: Map Scroll to Sunset ---
+    function updateSunPosition(value) {
+      const sliderVal = parseFloat(value);
+      const elevation = (sliderVal / 100) * 30 - 5;
+      const xPos = 0, zPos = -100, yPos = elevation;
+
+      sun.position.set(xPos, yPos, zPos);
+      sunLight.position.set(xPos, yPos, zPos - 20);
+
+      const t = Math.max(0, Math.min(1, (sliderVal) / 100));
+      const colorDay = new THREE.Color(0x87CEEB);
+      const colorSunset = new THREE.Color(0xFD5E53);
+      const colorNight = new THREE.Color(0x0f172a);
+
+      let skyColor;
+      if (t > 0.5) {
+        skyColor = colorSunset.clone().lerp(colorDay, (t - 0.5) * 2);
+        sunMaterial.color.setHex(0xffaa33);
+        sunLight.color.setHex(0xffaa33);
+        sunLight.intensity = 1.5;
+      } else {
+        skyColor = colorNight.clone().lerp(colorSunset, t * 2);
+        sunMaterial.color.setHex(0xff4500);
+        sunLight.color.setHex(0xff4500);
+        sunLight.intensity = 0.5 + t;
+      }
+
+      scene.background = skyColor;
+      scene.fog.color.copy(skyColor);
+      waterMaterial.color.lerpColors(new THREE.Color(0x001133), new THREE.Color(0x006994), t);
+    }
+
+    window.addEventListener('scroll', () => {
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      const scrollTop = window.scrollY;
+      const scrollPercent = Math.max(0, Math.min(1, scrollTop / docHeight));
+      const val = 40 - (scrollPercent * 40);
+      updateSunPosition(val);
+    });
+
+    updateSunPosition(40);
+
+    function animate() {
+      requestAnimationFrame(animate);
+      time += 0.005;
+
+      for (let i = 0; i < waterVertices.count; i++) {
+        const x = waterVertices.getX(i);
+        const y = waterVertices.getY(i);
+
+        const wave1 = Math.sin(x * 0.1 + time) * 1.5;
+        const wave2 = Math.cos(y * 0.1 + time * 0.8) * 1.5;
+        const wave3 = Math.sin((x + y) * 0.05 + time * 0.5) * 1.0;
+
+        waterVertices.setZ(i, initialWaterZ[i] + wave1 + wave2 + wave3);
+      }
+      waterVertices.needsUpdate = true;
+      waterGeometry.computeVertexNormals();
+
+      camera.position.x = Math.sin(time * 0.1) * 1;
+      camera.lookAt(0, 2, 0);
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
